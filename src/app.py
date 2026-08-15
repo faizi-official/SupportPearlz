@@ -128,7 +128,6 @@ with st.sidebar:
         saved_count = 0
         for uploaded_file in uploaded_files:
             file_path = os.path.join(KB_PATH, uploaded_file.name)
-            # Physical disk writing check
             with open(file_path, "wb") as f:
                 f.write(uploaded_file.getbuffer())
             saved_count += 1
@@ -136,7 +135,7 @@ with st.sidebar:
         if saved_count > 0:
             st.success(f"Successfully saved {saved_count} file(s) to knowledge base!")
             
-if st.button("🔄 Rebuild Vector Store", use_container_width=True):
+    if st.button("🔄 Rebuild Vector Store", use_container_width=True):
         st.cache_resource.clear()
         import shutil
         if os.path.exists(VECTOR_STORE_PATH):
@@ -149,13 +148,6 @@ if st.button("🔄 Rebuild Vector Store", use_container_width=True):
     
     # Session Management
     if st.button("🗑️ Clear Chat History", use_container_width=True):
-        st.session_state.messages = []
-        st.rerun()            
-    
-    st.markdown("---")
-    
-    # Session Management
-    if st.button("🗑️ Clear Chat History", use_content_width=True if hasattr(st, "use_content_width") else True):
         st.session_state.messages = []
         st.rerun()
 
@@ -294,4 +286,3 @@ Question: {question}"""
 
     except Exception as e:
         st.error(f"⚠️ A technical error occurred: {str(e)}")
-        

@@ -136,9 +136,8 @@ with st.sidebar:
         if saved_count > 0:
             st.success(f"Successfully saved {saved_count} file(s) to knowledge base!")
             
-    if st.button("🔄 Rebuild Vector Store", use_content_width=True if hasattr(st, "use_content_width") else True):
+if st.button("🔄 Rebuild Vector Store", use_container_width=True):
         st.cache_resource.clear()
-        # Purane vector store ko clear karein taake naye documents index ho sakein
         import shutil
         if os.path.exists(VECTOR_STORE_PATH):
             shutil.rmtree(VECTOR_STORE_PATH)
@@ -146,6 +145,13 @@ with st.sidebar:
         st.success("Vector store cache cleared! Rebuilding...")
         st.rerun()
 
+    st.markdown("---")
+    
+    # Session Management
+    if st.button("🗑️ Clear Chat History", use_container_width=True):
+        st.session_state.messages = []
+        st.rerun()            
+    
     st.markdown("---")
     
     # Session Management

@@ -120,23 +120,36 @@ with st.sidebar:
     
     st.markdown("---")
     
-    # Live Document Uploader
+    # Live Document Uploader & Physical Saving Logic
     st.markdown("### 📁 Knowledge Base")
     uploaded_files = st.file_uploader("Upload reference documents", accept_multiple_files=True, type=["txt", "pdf", "md"])
+    
     if uploaded_files:
+        saved_count = 0
         for uploaded_file in uploaded_files:
             file_path = os.path.join(KB_PATH, uploaded_file.name)
+            # Physical disk writing check
             with open(file_path, "wb") as f:
                 f.write(uploaded_file.getbuffer())
-        st.success(f"Successfully uploaded {len(uploaded_files)} file(s)!")
-        if st.button("🔄 Rebuild Vector Store", use_container_width=True):
-            st.cache_resource.clear()
-            st.rerun()
+            saved_count += 1
+        
+        if saved_count > 0:
+            st.success(f"Successfully saved {saved_count} file(s) to knowledge base!")
+            
+    if st.button("🔄 Rebuild Vector Store", use_content_width=True if hasattr(st, "use_content_width") else True):
+        st.cache_resource.clear()
+        # Purane vector store ko clear karein taake naye documents index ho sakein
+        import shutil
+        if os.path.exists(VECTOR_STORE_PATH):
+            shutil.rmtree(VECTOR_STORE_PATH)
+        os.makedirs(VECTOR_STORE_PATH, exist_ok=True)
+        st.success("Vector store cache cleared! Rebuilding...")
+        st.rerun()
 
     st.markdown("---")
     
     # Session Management
-    if st.button("🗑️ Clear Chat History", use_container_width=True):
+    if st.button("🗑️ Clear Chat History", use_content_width=True if hasattr(st, "use_content_width") else True):
         st.session_state.messages = []
         st.rerun()
 
@@ -275,3 +288,4 @@ Question: {question}"""
 
     except Exception as e:
         st.error(f"⚠️ A technical error occurred: {str(e)}")
+        
